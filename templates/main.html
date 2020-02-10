@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Streamlit Launchpad</title>
+</head>
+<body>
+
+<h2>Streamlit Apps</h2>
+<p>Reading from {{ cwd }}</p>
+
+<ul>
+    {% for app in apps %}
+    {% block appitem %}
+    <li><a href="{{ app.url }}" target="_slaunch_{{ app.name }}">{{ escape(app.name) }}</a></li>
+    {% end %}
+    {% end %}
+</ul>
+</body>
+</html>

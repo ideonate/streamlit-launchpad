@@ -1,11 +1,7 @@
-import os.path
 import tornado
 import tornado.web
 import tornado.websocket
 import tornado.httpclient
-
-ap = os.path.abspath
-join = os.path.join
 
 tornado.httpclient.AsyncHTTPClient.configure(None, defaults={'decompress_response': False})
 

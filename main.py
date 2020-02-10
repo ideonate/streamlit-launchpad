@@ -1,21 +1,33 @@
 import tornado.ioloop
 import tornado.web
-from tornado import httpclient
+import tornado.template
 import os
 import subprocess
 import handlers
 import re
+from collections import namedtuple
+AppInfo = namedtuple('AppInfo', 'name url')
 
 # py file name to port number
 proxymap = {}
 
 port = 8505
 
+template_loader = tornado.template.Loader("templates")
+
+scan_folder_name = 'examples'
+
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(os.getcwd())
-        for f in os.scandir('./examples'):
-            self.write("File: {}".format(f.name))
+        apps = []
+        for f in os.scandir('./'+scan_folder_name):
+            if f.name[-3:] == '.py':
+                apps.append(AppInfo(name=f.name, url="/{}/".format(f.name)))
+
+        self.write(template_loader.load('main.html').generate(apps=apps, cwd=os.path.join(os.getcwd(), scan_folder_name)))
+        self.finish()
+
 
 class DefaultProxyHandler(tornado.web.RequestHandler):
 
@@ -44,7 +56,7 @@ class DefaultProxyHandler(tornado.web.RequestHandler):
 
             global port
 
-            proc = subprocess.Popen(['streamlit', 'run', os.path.join('./examples', appname),
+            proc = subprocess.Popen(['streamlit', 'run', os.path.join('./', scan_folder_name, appname),
                                      '--server.port', str(port),
                                      '--server.headless', 'True'])
 
