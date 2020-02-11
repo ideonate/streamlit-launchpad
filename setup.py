@@ -1,17 +1,18 @@
 import setuptools
 
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-# read requirements.txt
-with open('requirements.txt', 'r') as f:
-    content = f.read()
-li_req = content.split('\n')
-install_requires = [e.strip() for e in li_req if len(e)]
+install_requires = [
+    "streamlit>=0.54.0",
+    "tornado>=5.1.1",
+    "Click>=7.0"
+]
 
 setuptools.setup(
     name="streamlit-launchpad",
-    version="0.0.2",
+    version="0.0.3",
     author="Dan Lester",
     author_email="dan@ideonate.com",
     description="Web launchpad to browse a folder containing multiple Streamlit applications",
@@ -30,3 +31,5 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
 )
+
+
