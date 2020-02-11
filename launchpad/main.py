@@ -65,22 +65,17 @@ class DefaultProxyHandler(tornado.web.RequestHandler):
                 proxymap[appname]['stopped'] = True
 
                 proc = proxymap[appname]['proc']
-                if proc and proc.stdout and proc.stderr:
-                    print(proc.stdout)
-                    print(proc.stderr)
-
-                    #with io.BytesIO(b'here is the default') as buf:
-
-                    #    proc.stdout.read_into(buf.getbuffer())
-                    #    proxymap[appname]['stdout'] = str(buf.getvalue())
-
-                    proxymap[appname]['stderr'] = proc.stderr
-                    proxymap[appname]['stdout'] = proc.stdout
+                if proc:
+                    if proc.stderr:
+                        proxymap[appname]['stderr'] = proc.stderr
+                    if proc.stdout:
+                        proxymap[appname]['stdout'] = proc.stdout
 
             proc = tornado.process.Subprocess(['streamlit', 'run', os.path.join(scan_folder_path, appname),
                                                '--server.port', str(port),
                                                '--server.headless', 'True',
-                                               '--server.runOnSave', 'True'],
+                                               '--server.runOnSave', 'True',
+                                               '--server.enableCORS', 'False'],
                                               stdout=tornado.process.Subprocess.STREAM, stderr=tornado.process.Subprocess.STREAM)
 
             proc.set_exit_callback(exit_callback)

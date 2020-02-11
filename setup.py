@@ -11,7 +11,7 @@ install_requires = [e.strip() for e in li_req if len(e)]
 
 setuptools.setup(
     name="streamlit-launchpad",
-    version="0.0.1",
+    version="0.0.2",
     author="Dan Lester",
     author_email="dan@ideonate.com",
     description="Web launchpad to browse a folder containing multiple Streamlit applications",
