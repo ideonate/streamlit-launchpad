@@ -1,0 +1,9 @@
+
+# js
+recursive-include launchpad/templates *.*
+
+# Misc
+include requirements.txt
+include LICENSE
+include README.md
+global-exclude *.py[co]
