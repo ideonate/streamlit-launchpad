@@ -2,6 +2,7 @@ import tornado
 import tornado.web
 import tornado.websocket
 import tornado.httpclient
+import tornado.gen
 
 tornado.httpclient.AsyncHTTPClient.configure(None, defaults={'decompress_response': False})
 
@@ -40,7 +41,25 @@ class ProxyHandler(tornado.web.RequestHandler):
 
         req = tornado.httpclient.HTTPRequest(url, headers=incoming_headers)
         client = tornado.httpclient.AsyncHTTPClient()
-        response = await client.fetch(req, raise_error=False)
+
+        response = None
+        retries = 0
+
+        while not response and retries < 100:
+            response = await client.fetch(req, raise_error=False)
+            if response.error:
+                print(" **** response.error")
+                print(response.error)
+                if response.code == 599: # Maybe server wasn't yet ready
+                    print(" **** response.error 599 ***")
+                    response = None
+                    retries += 1
+                    await tornado.gen.sleep(0.1)
+
+        if not response:
+            self.set_status(404)
+            self.finish()
+            return
 
         if debug:
             print(incoming_headers)
@@ -51,16 +70,10 @@ class ProxyHandler(tornado.web.RequestHandler):
 
             print(response.code)
 
-        # websocket upgrade
-        if response.code == 599:
-            self.set_status(200)  # switching protocols
-            return
-
         self.set_status(response.code)
         if response.code != 200:
             self.finish()
         else:
-            self.set_status(response.code)
             if response.body:
                 if debug:
                     print("response body")

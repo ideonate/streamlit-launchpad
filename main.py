@@ -79,7 +79,8 @@ class DefaultProxyHandler(tornado.web.RequestHandler):
 
             proc = tornado.process.Subprocess(['streamlit', 'run', os.path.join(scan_folder_path, appname),
                                                '--server.port', str(port),
-                                               '--server.headless', 'True'],
+                                               '--server.headless', 'True',
+                                               '--server.runOnSave', 'True'],
                                               stdout=tornado.process.Subprocess.STREAM, stderr=tornado.process.Subprocess.STREAM)
 
             proc.set_exit_callback(exit_callback)
