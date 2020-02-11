@@ -18,7 +18,7 @@ Serves *.py as separate Streamlit applications from the folder supplied on the c
 streamlit-launchpad ./examples
 ```
 
-Then go to http://localhost:8000/ in your browser:
+Then go to http://localhost:8888/ in your browser:
 
 ![Launchpad screenshot](screenshots/Launchpad.png)
 
