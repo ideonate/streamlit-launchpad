@@ -35,9 +35,8 @@ class ProxyHandler(tornado.web.RequestHandler):
         for k,v in self.request.headers.items():
             if not k.lower() in ['host', 'pragma', 'upgrade-insecure-requests',
                                  'sec-fetch-user', 'sec-fetch-site', 'sec-fetch-mode', 'accept-encoding']:
-                #, 'accept-encoding', 'accept-language', 'accept', 'cache-control',
+                # 'accept-encoding', 'accept-language', 'accept', 'cache-control',
                 incoming_headers[k] = v
-
 
         req = tornado.httpclient.HTTPRequest(url, headers=incoming_headers)
         client = tornado.httpclient.AsyncHTTPClient()
@@ -51,7 +50,6 @@ class ProxyHandler(tornado.web.RequestHandler):
             print(response.headers)
 
             print(response.code)
-
 
         # websocket upgrade
         if response.code == 599:

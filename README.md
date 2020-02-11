@@ -6,11 +6,11 @@ This is a very basic alpha version.
 
 ## Running
 
-Must currently be run from the project folder, and only serves *.py from the examples subfolder.
+Must currently be run from the project folder. Serves *.py from the folder supplied on the command line.
 
 ```
 git clone https://github.com/ideonate/streamlit-launchpad.git
 cd streamlit-launchpad
 
-python main.py
+python main.py ./examples
 ```

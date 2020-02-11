@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>Streamlit Launchpad - app status</title>
+</head>
+<body>
+
+<h2>Streamlit App Status</h2>
+<p>Status of <a href="{{ app.url }}" target="_slaunch_{{ escape(app.name) }}">{{ escape(app.name) }}</a> on port {{ port }}.</p>
+
+<p>App appears to have stopped. Removing so you can refresh your browser to try again.</p>
+
+{% if stderr %}
+<pre>
+{{ escape(stderr) }}
+</pre>
+{% endif %}
+
+{% if stdout %}
+<pre>
+{{ escape(stdout) }}
+</pre>
+{% endif %}
+
+
+</body>
+</html>
