@@ -1,24 +1,24 @@
 import tornado.ioloop
 import tornado.web
 import tornado.template
-import os
+import os, sys
 import tornado.process
-import handlers
 import re
 import click
 from collections import namedtuple
-AppInfo = namedtuple('AppInfo', 'name url')
+from .dynamicapplication import DynamicApplication
+from .handlers import ProxyWSHandler, ProxyHandler
 
-from dynamicapplication import DynamicApplication
+AppInfo = namedtuple('AppInfo', 'name url')
 
 # py file name to port number
 proxymap = {}
 
 port = 8500
 
-template_loader = tornado.template.Loader("templates")
+template_loader = tornado.template.Loader(os.path.join(os.path.dirname(os.path.realpath(__file__)),"templates"))
 
-scan_folder_path = 'examples'
+scan_folder_path = '../examples'
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -92,8 +92,8 @@ class DefaultProxyHandler(tornado.web.RequestHandler):
             self.application.add_handlers(
                 r".*",
                 [
-                    (rf"^/{appname}/stream(.*)", handlers.ProxyWSHandler, {'proxy_url': url+'stream'}, appname+'ws'),
-                    (rf"^/{appname}/(.*)", handlers.ProxyHandler, {'proxy_url': url}, appname+'http')
+                    (rf"^/{appname}/stream(.*)", ProxyWSHandler, {'proxy_url': url + 'stream'}, appname + 'ws'),
+                    (rf"^/{appname}/(.*)", ProxyHandler, {'proxy_url': url}, appname + 'http')
                 ])
 
             print("Started {}: {}".format(appname, port))
