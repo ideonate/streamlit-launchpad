@@ -143,7 +143,7 @@ def run(port, folder):
     scan_folder_path = os.path.abspath(folder)
     app = make_app()
 
-    async def shutdown():     
+    async def shutdown():
         tornado.ioloop.IOLoop.current().stop()
 
         for (appname, appval) in proxymap.items():
@@ -151,7 +151,7 @@ def run(port, folder):
                 proc = appval['proc']
                 if proc:
                     print('Stopping proc for app {}'.format(appname))
-                    proc.terminate()
+                    proc.proc.terminate()
 
     def exit_handler(sig, frame):
         tornado.ioloop.IOLoop.current().add_callback_from_signal(shutdown)
