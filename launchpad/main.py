@@ -76,7 +76,8 @@ class DefaultProxyHandler(tornado.web.RequestHandler):
                                                '--server.headless', 'True',
                                                '--server.runOnSave', 'True',
                                                '--server.enableCORS', 'False'],
-                                              stdout=tornado.process.Subprocess.STREAM, stderr=tornado.process.Subprocess.STREAM)
+                                              stdout=tornado.process.Subprocess.STREAM, stderr=tornado.process.Subprocess.STREAM,
+                                              cwd=scan_folder_path)
 
             proc.set_exit_callback(exit_callback)
 

@@ -6,14 +6,21 @@ import tornado.gen
 
 tornado.httpclient.AsyncHTTPClient.configure(None, defaults={'decompress_response': False})
 
+MAX_RETRIES = 100
+
 
 class ProxyHandler(tornado.web.RequestHandler):
     def initialize(self, proxy_url='/', **kwargs):
         super(ProxyHandler, self).initialize(**kwargs)
         self.proxy_url = proxy_url
 
+    async def post(self, url=None):
+        return await self.handle_req(url)
+
     async def get(self, url=None):
-        '''Get the login page'''
+        return await self.handle_req(url)
+
+    async def handle_req(self, url=None):
         print("INCOMING URL: "+url)
         #url = url or self.proxy_url
         if url is None:
@@ -29,7 +36,7 @@ class ProxyHandler(tornado.web.RequestHandler):
         url = self.proxy_url+url
 
         if debug:
-            print("GET : "+url)
+            print("{} : {}".format(self.request.method, url))
 
         incoming_headers = {}
 
@@ -39,13 +46,17 @@ class ProxyHandler(tornado.web.RequestHandler):
                 # 'accept-encoding', 'accept-language', 'accept', 'cache-control',
                 incoming_headers[k] = v
 
-        req = tornado.httpclient.HTTPRequest(url, headers=incoming_headers)
+        body = None
+        if self.request.method == 'POST':
+            body = self.request.body
+
+        req = tornado.httpclient.HTTPRequest(url, headers=incoming_headers, method=self.request.method, body=body)
         client = tornado.httpclient.AsyncHTTPClient()
 
         response = None
         retries = 0
 
-        while not response and retries < 100:
+        while not response and retries < MAX_RETRIES:
             response = await client.fetch(req, raise_error=False)
             if response.error:
                 print(" **** response.error")
