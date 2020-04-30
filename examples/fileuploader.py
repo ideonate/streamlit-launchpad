@@ -6,7 +6,6 @@ import pandas as pd
 st.markdown('# Based on subfolder path')
 
 path_input_data = st.sidebar.text_input("Provide the name to the subfolder in which your csv files are "
-
                                             "stored.")
 st.write("Input path:", path_input_data)
 

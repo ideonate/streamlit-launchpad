@@ -1,7 +1,7 @@
 import tornado.ioloop
 import tornado.web
 import tornado.template
-import os, sys
+import os, signal
 import tornado.process
 import re
 import click
@@ -142,10 +142,26 @@ def run(port, folder):
     global scan_folder_path
     scan_folder_path = os.path.abspath(folder)
     app = make_app()
+
+    async def shutdown():     
+        tornado.ioloop.IOLoop.current().stop()
+
+        for (appname, appval) in proxymap.items():
+            if not appval['stopped']:
+                proc = appval['proc']
+                if proc:
+                    print('Stopping proc for app {}'.format(appname))
+                    proc.terminate()
+
+    def exit_handler(sig, frame):
+        tornado.ioloop.IOLoop.current().add_callback_from_signal(shutdown)
+
+    signal.signal(signal.SIGTERM, exit_handler)
+    signal.signal(signal.SIGINT,  exit_handler)
+
     app.listen(port)
     print("Starting streamlit launchpad server of folder {} on port {}".format(scan_folder_path, port))
     tornado.ioloop.IOLoop.current().start()
-
 
 if __name__ == '__main__':
     run()
