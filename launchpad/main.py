@@ -75,7 +75,7 @@ class DefaultProxyHandler(tornado.web.RequestHandler):
                                                '--server.port', str(port),
                                                '--server.headless', 'true',
                                                '--server.runOnSave', 'true',
-                                               '--server.enableCORS', 'false'
+                                               '--server.enableCORS', 'false',
                                                '--server.enableXsrfProtection', 'false'],
                                               stdout=tornado.process.Subprocess.STREAM, stderr=tornado.process.Subprocess.STREAM,
                                               cwd=scan_folder_path)
