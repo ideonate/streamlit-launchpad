@@ -4,7 +4,7 @@ Update setup.py to the new version
 
 delete dist folder
 
-`python setup.py sdist`
+`python setup.py sdist bdist_wheel`
 
 `twine upload dist/*`
 
