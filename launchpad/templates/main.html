@@ -8,7 +8,7 @@
 <p>Reading from {{ cwd }}</p>
 
 <ul>
-    {% for app in apps %}
+    {% for app in sorted(apps) %}
     {% block appitem %}
     <li><a href="{{ app.url }}" target="_slaunch_{{ escape(app.name) }}">{{ escape(app.name) }}</a></li>
     {% end %}
