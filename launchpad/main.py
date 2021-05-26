@@ -28,7 +28,7 @@ class MainHandler(tornado.web.RequestHandler):
             if f.name[-3:] == '.py':
                 apps.append(AppInfo(name=f.name, url="/{}/".format(f.name)))
 
-        self.write(template_loader.load('main.html').generate(apps=apps, cwd=scan_folder_path))
+        self.write(template_loader.load('main.html').generate(apps=apps, cwd=scan_folder_path, title=page_title))
         self.finish()
 
 
@@ -138,10 +138,12 @@ def make_app():
 
 @click.command()
 @click.option('--port', default=8888, help='port for the launchpad server')
+@click.option('--title', default="Streamlit Apps", help='title for the streamlit web page')
 @click.argument('folder')
-def run(port, folder):
-    global scan_folder_path
+def run(port, title, folder):
+    global scan_folder_path, page_title
     scan_folder_path = os.path.abspath(folder)
+    page_title = title
     app = make_app()
 
     async def shutdown():
