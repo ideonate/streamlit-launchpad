@@ -1,8 +1,10 @@
 import tornado.ioloop
 import tornado.web
 import tornado.template
-import os, signal
+import os, signal, platform
 import tornado.process
+import subprocess
+import threading
 import re
 import click
 from collections import namedtuple
@@ -19,6 +21,29 @@ port = 8500
 template_loader = tornado.template.Loader(os.path.join(os.path.dirname(os.path.realpath(__file__)),"templates"))
 
 scan_folder_path = '../examples'
+
+
+def popenAndCall(onExit, *popenArgs, **popenKWArgs):
+    """
+    Runs a subprocess.Popen, and then calls the function onExit when the
+    subprocess completes. This replicates the tornado.process.Suprocess for Windows
+    This code from:
+    https://stackoverflow.com/questions/2581817/python-subprocess-callback-when-cmd-exits
+
+    Use it exactly the way you'd normally use subprocess.Popen, except include a
+    callable to execute as the first argument. onExit is a callable object, and
+    *popenArgs and **popenKWArgs are simply passed up to subprocess.Popen.
+    """
+    def runInThread(onExit, popenArgs, popenKWArgs):
+        proc = subprocess.Popen(*popenArgs, **popenKWArgs)
+        proc.wait()
+        onExit()
+        return
+
+    thread = threading.Thread(target=runInThread,
+                              args=(onExit, popenArgs, popenKWArgs))
+    thread.start()
+    return thread # returns immediately after the thread starts
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -71,16 +96,25 @@ class DefaultProxyHandler(tornado.web.RequestHandler):
                     if proc.stdout:
                         proxymap[appname]['stdout'] = proc.stdout
 
-            proc = tornado.process.Subprocess(['streamlit', 'run', os.path.join(scan_folder_path, appname),
-                                               '--server.port', str(port),
-                                               '--server.headless', 'true',
-                                               '--server.runOnSave', 'true',
-                                               '--server.enableCORS', 'false',
-                                               '--server.enableXsrfProtection', 'false'],
-                                              stdout=tornado.process.Subprocess.STREAM, stderr=tornado.process.Subprocess.STREAM,
-                                              cwd=scan_folder_path)
+            if platform.system() == "Windows":  # tornado.process.Subprocess does not work on Windows
+                proc = popenAndCall(exit_callback, ['streamlit', 'run', os.path.join(scan_folder_path, appname),
+                                                    '--server.port', str(port),
+                                                    '--server.headless', 'true',
+                                                    '--server.runOnSave', 'true',
+                                                    '--server.enableCORS', 'false',
+                                                    '--server.enableXsrfProtection', 'false'],
+                                                   cwd=scan_folder_path)
+            else:  # for Linux use standard tornado.process.Subprocess
+                proc = tornado.process.Subprocess(['streamlit', 'run', os.path.join(scan_folder_path, appname),
+                                                   '--server.port', str(port),
+                                                   '--server.headless', 'true',
+                                                   '--server.runOnSave', 'true',
+                                                   '--server.enableCORS', 'false',
+                                                   '--server.enableXsrfProtection', 'false'],
+                                                  stdout=tornado.process.Subprocess.STREAM, stderr=tornado.process.Subprocess.STREAM,
+                                                  cwd=scan_folder_path)
 
-            proc.set_exit_callback(exit_callback)
+                proc.set_exit_callback(exit_callback)
 
             proxymap[appname] = {'proc': proc, 'port': port, 'stopped': False, 'stdout': None, 'stderr': None}
 
@@ -165,6 +199,7 @@ def run(port, title, folder):
     app.listen(port)
     print("Starting streamlit launchpad server of folder {} on port {}".format(scan_folder_path, port))
     tornado.ioloop.IOLoop.current().start()
+
 
 if __name__ == '__main__':
     run()
