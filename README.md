@@ -28,6 +28,12 @@ To run on a different port use:
 streamlit-launchpad --port 8000 ./examples
 ```
 
+To provide a title (default is "Streamlit Apps"):
+
+```
+streamlit-launchpad --title="My Title" ./examples
+```
+
 ## Development install
 
 ```
