@@ -2,7 +2,7 @@
 
 Web launchpad to browse a folder containing multiple Streamlit applications (py files), with a central launchpad listing available apps so you can run them (if not already running) and view each in its own tab.
 
-This is a very basic alpha version. Windows is not supported.
+This is a very basic alpha version. Windows is now supported. For Windows, torando >= 6.1 is required
 
 ## Install and Run
 
